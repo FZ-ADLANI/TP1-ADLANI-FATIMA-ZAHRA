@@ -7,7 +7,7 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import ma.emsi.fza.tp1fz_adlani.llm.JsonUtil;
+import ma.emsi.fza.tp1fz_adlani.llm.JsonUtilPourGemini;
 import ma.emsi.fza.tp1fz_adlani.llm.LlmInteraction;
 
 import java.io.Serializable;
@@ -80,7 +80,7 @@ public class Bb implements Serializable {
      * Utilitaire pour gérer les requêtes JSON vers l'API du LLM.
      */
     @Inject
-    private JsonUtil jsonUtil;
+    private JsonUtilPourGemini jsonUtil;
 
     /**
      * Obligatoire pour un bean CDI (classe gérée par CDI), s'il y a un autre constructeur.
@@ -211,6 +211,12 @@ public class Bb implements Serializable {
                     are you tell them the average price of a meal.
                     """;
             this.listeRolesSysteme.add(new SelectItem(role, "Guide touristique"));
+
+            role = """
+                    You are an expert in lullabies for babies. Provide creative and soothing lullaby ideas adapt
+                    Your suggestions should be gentle, relaxing and promote the baby's sleep.
+                    """;
+            this.listeRolesSysteme.add(new SelectItem(role, "Expert en berceuses pour bébés"));
         }
 
         return this.listeRolesSysteme;

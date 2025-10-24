@@ -38,6 +38,10 @@ public class JsonUtilPourGemini implements Serializable {
         this.systemRole = systemRole;
     }
 
+    public void setRoleSysteme(String roleSysteme) {
+        this.systemRole = roleSysteme;
+    }
+
     /**
      * Pour envoyer une requête à l'API de Gemini.
      */
