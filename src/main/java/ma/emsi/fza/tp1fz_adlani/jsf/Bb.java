@@ -7,6 +7,9 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import ma.emsi.fza.tp1fz_adlani.llm.JsonUtil;
+import ma.emsi.fza.tp1fz_adlani.llm.LlmInteraction;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +77,12 @@ public class Bb implements Serializable {
     private FacesContext facesContext;
 
     /**
+     * Utilitaire pour gérer les requêtes JSON vers l'API du LLM.
+     */
+    @Inject
+    private JsonUtil jsonUtil;
+
+    /**
      * Obligatoire pour un bean CDI (classe gérée par CDI), s'il y a un autre constructeur.
      */
     public Bb() {
@@ -121,10 +130,8 @@ public class Bb implements Serializable {
     }
 
     /**
-     * Envoie la question au serveur.
-     * En attendant de l'envoyer à un LLM, le serveur fait un traitement quelconque, juste pour tester :
-     * Le traitement consiste à copier la question en minuscules et à l'entourer avec "||". Le rôle système
-     * est ajouté au début de la première réponse.
+     * Envoie la question à l'API du LLM.
+     * Si c'est le début de la conversation, envoie d'abord le rôle système à jsonUtil.
      *
      * @return null pour rester sur la même page.
      */
@@ -136,18 +143,25 @@ public class Bb implements Serializable {
             facesContext.addMessage(null, message);
             return null;
         }
-        // Entourer la réponse avec "||".
-        this.reponse = "||";
-        // Si la conversation n'a pas encore commencé, ajouter le rôle système au début de la réponse
+
         if (this.conversation.isEmpty()) {
-            // Ajouter le rôle système au début de la réponse
-            this.reponse += roleSysteme.toUpperCase(Locale.FRENCH) + "\n";
-            // Invalide le bouton pour changer le rôle système
+            // Si c'est le début de la conversation, on envoie le rôle système
+            jsonUtil.setRoleSysteme(roleSysteme);
             this.roleSystemeChangeable = false;
         }
-        this.reponse += question.toLowerCase(Locale.FRENCH) + "||";
-        // La conversation contient l'historique des questions-réponses depuis le début.
-        afficherConversation();
+
+        try {
+            LlmInteraction interaction = jsonUtil.envoyerRequete(question);
+            this.reponse = interaction.reponseExtraite();
+            this.texteRequeteJson = interaction.questionJson();
+            this.texteReponseJson = interaction.reponseJson();
+            afficherConversation();
+        } catch (Exception e) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Problème de connexion avec l'API du LLM",
+                    "Problème de connexion avec l'API du LLM" + e.getMessage());
+            facesContext.addMessage(null, message);
+        }
         return null;
     }
 
