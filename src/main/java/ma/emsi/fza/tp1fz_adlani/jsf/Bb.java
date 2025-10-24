@@ -53,6 +53,21 @@ public class Bb implements Serializable {
     private StringBuilder conversation = new StringBuilder();
 
     /**
+     * Mode debug pour afficher les JSON envoyés et reçus.
+     */
+    private boolean debug = false;
+
+    /**
+     * Texte JSON de la requête envoyée à l'API du LLM.
+     */
+    private String texteRequeteJson;
+
+    /**
+     * Texte JSON de la réponse reçue de l'API du LLM.
+     */
+    private String texteReponseJson;
+
+    /**
      * Contexte JSF. Utilisé pour qu'un message d'erreur s'affiche dans le formulaire.
      */
     @Inject
@@ -185,6 +200,34 @@ public class Bb implements Serializable {
         }
 
         return this.listeRolesSysteme;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public void toggleDebug() {
+        this.debug = !this.debug;
+    }
+
+    public String getTexteRequeteJson() {
+        return texteRequeteJson;
+    }
+
+    public void setTexteRequeteJson(String texteRequeteJson) {
+        this.texteRequeteJson = texteRequeteJson;
+    }
+
+    public String getTexteReponseJson() {
+        return texteReponseJson;
+    }
+
+    public void setTexteReponseJson(String texteReponseJson) {
+        this.texteReponseJson = texteReponseJson;
     }
 
 }
