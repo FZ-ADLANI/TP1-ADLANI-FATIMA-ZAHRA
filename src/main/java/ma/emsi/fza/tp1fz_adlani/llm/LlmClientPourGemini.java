@@ -28,24 +28,35 @@ public class LlmClientPourGemini implements Serializable {
 
     public LlmClientPourGemini() {
         // Récupère la clé secrète pour travailler avec l'API du LLM, mise dans une variable d'environnement
-        // du système d'exploitation.
+
         this.key = System.getenv("Gemini-API-Key");
+        if (this.key == null || this.key.isEmpty()) {
+            /*
+             *msg d'erreur en cas ou La clé n'est pas définie
+             * */
+            throw new IllegalStateException("La clé GEMINI_KEY n'est pas définie dans les variables d'environnement !");
+        }
+
         // Client REST pour envoyer des requêtes vers les endpoints de l'API du LLM
         this.clientRest = ClientBuilder.newClient();
         // Endpoint REST pour envoyer la question à l'API.
-        // L'URL à trouver a été utilisé dans la commande curl pour tester la clé secrète.
-        // Elle se trouve aussi dans le support de cours.
-        this.target = clientRest.target("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + key);
+
+        this.target = clientRest.target(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + key );
     }
+
 
     /**
      * Envoie une requête à l'API de Gemini.
      * @param requestEntity le corps de la requête (en JSON).
      * @return réponse REST de l'API (corps en JSON).
      */
-    public Response envoyerRequete(Entity requestEntity) {
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON_TYPE);
-        // Envoie la requête POST au LLM
+    public Response envoyerRequete(Entity<?> requestEntity) {
+        // Ajout de la clé d’API dans l’URL
+        Invocation.Builder request = target
+                .queryParam("key", key)
+                .request(MediaType.APPLICATION_JSON_TYPE);
+
         return request.post(requestEntity);
     }
 
